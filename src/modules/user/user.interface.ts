@@ -18,10 +18,11 @@ export interface Iuser{
       name:string,
       email:string,
       password?:string,
-      mobile?:string,
+      phone?:string,
       picture?:string,
       role:Role,
       status:Status,
+      address?:string,
       auth:IAuthProvider[] // user after google login can update password then do login with that password and email
       
 }

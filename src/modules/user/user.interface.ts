@@ -11,7 +11,7 @@ export enum Status{
 
 export interface IAuthProvider{
       provider:"google"|"credential",
-      providerId:"string"
+      providerId:string
 }
 
 export interface Iuser{

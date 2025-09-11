@@ -1,7 +1,7 @@
 import { model, Schema } from "mongoose"
 import { IAuthProvider, Iuser, Role, Status } from "./user.interface"
 
-const autProviderSchema = new Schema<IAuthProvider>({
+const authProviderSchema = new Schema<IAuthProvider>({
       provider: { type: String, required: true },
       providerId: { type: String, required: true }
 }, {
@@ -17,7 +17,8 @@ const userSchema = new Schema<Iuser>({
       picture: { type: String },
       address: { type: String },
       role: { type: String, enum: Object.values(Role), default: Role.USER },
-      status: { type: String, enum: Object.values(Status), default: Status.ACTIVE }
+      status: { type: String, enum: Object.values(Status), default: Status.ACTIVE },
+      auth:[authProviderSchema]
 
 }, {
       timestamps: true,

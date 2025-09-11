@@ -1,21 +1,21 @@
 import { NextFunction, Request, Response } from "express";
-import { UserServices } from './user.service';
+import { riderServices } from './rider.service';
 import { sendResponse } from "../../utils/sendResponse";
 import httpStatus from 'http-status-codes';
 
 const registerwithCredentials = async (req: Request, res: Response, next: NextFunction) => {
       try {
-            const user = await UserServices.createUserWithCredential(req.body)
+            const rider = await riderServices.createriderWithCredential(req.body)
             sendResponse(res, {
                   success: true,
                   statusCode: (httpStatus.CREATED),
-                  message: `User registered successfully with credentials`,
-                  data: user
+                  message: `rider registered successfully with credentials`,
+                  data: rider
             })
       } catch (error) {
             next(error)
       }
 }
-export const UserControler = ({
+export const riderControler = ({
       registerwithCredentials,
 })

@@ -1,5 +1,5 @@
 import { model, Schema } from "mongoose"
-import { IAuthProvider, Iuser, Role, Status } from "./user.interface"
+import { IAuthProvider, Irider, Role, Status } from "./rider.interface"
 
 const authProviderSchema = new Schema<IAuthProvider>({
       provider: { type: String, required: true },
@@ -9,14 +9,14 @@ const authProviderSchema = new Schema<IAuthProvider>({
       _id: false
 })
 
-const userSchema = new Schema<Iuser>({
+const riderSchema = new Schema<Irider>({
       name: { type: String, required: true },
       email: { type: String, required: true },
       password: { type: String },
       phone: { type: String },
       picture: { type: String },
       address: { type: String },
-      role: { type: String, enum: Object.values(Role), default: Role.USER },
+      role: { type: String, enum: Object.values(Role), default: Role.RIDER },
       status: { type: String, enum: Object.values(Status), default: Status.ACTIVE },
       auth:[authProviderSchema]
 
@@ -24,4 +24,4 @@ const userSchema = new Schema<Iuser>({
       timestamps: true,
       versionKey: false
 })
-export const User = model<Iuser>("user",userSchema);
+export const rider = model<Irider>("rider",riderSchema);

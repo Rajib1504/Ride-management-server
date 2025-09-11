@@ -1,16 +1,16 @@
 import AppError from "../../ErrorHelper/AppError";
-import { IAuthProvider, Iuser } from "./user.interface";
-import { User } from "./user.model";
+import { IAuthProvider, Irider } from "./rider.interface";
+import { rider } from "./rider.model";
 import httpStatus from "http-status-codes"
 import bcryptjs from "bcryptjs"
 import { envVars } from "../../config/env";
 
-const createUserWithCredential = async (payload: Partial<Iuser>) => {
+const createriderWithCredential = async (payload: Partial<Irider>) => {
       const { email , password, ...rest } = payload;
 
-      const isUserexist = await User.findOne({ email })
-      if (isUserexist) {
-            throw new AppError(httpStatus.BAD_REQUEST, "User with this email already exist", "")
+      const isriderexist = await rider.findOne({ email })
+      if (isriderexist) {
+            throw new AppError(httpStatus.BAD_REQUEST, "rider with this email already exist", "")
       }
 
       const hashedPassword = await bcryptjs.hash(password as string,Number(envVars.BCRYPT_SALT_ROUND));
@@ -20,15 +20,15 @@ const createUserWithCredential = async (payload: Partial<Iuser>) => {
             providerId: email || "",
       };
 
-      const newUser = await User.create({
+      const newrider = await rider.create({
             email,
             password:hashedPassword,
             auth:[authProvider],
             ...rest
       })
-      return {newUser}
+      return {newrider}
 }
 
-export const UserServices = ({
-      createUserWithCredential,
+export const riderServices = ({
+      createriderWithCredential,
 })

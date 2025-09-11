@@ -6,10 +6,12 @@ PORT:string,
 DB_URL:string,
 BCRYPT_SALT_ROUND:string,
 NODE_ENV:'development'| 'production',
+JWT_ACCESS_EXPIRES:string,
+JWT_ACCESS_SECRET:string,
 }
 
 const loadEnvVariables =()=>{
-      const reqiredEnvVariables: string[]= ["PORT","DB_URL","BCRYPT_SALT_ROUND","NODE_ENV"]
+      const reqiredEnvVariables: string[]= ["PORT","DB_URL","BCRYPT_SALT_ROUND","NODE_ENV","JWT_ACCESS_SECRET","JWT_ACCESS_EXPIRES"]
 
       reqiredEnvVariables.forEach(key=>{
             if(!process.env[key]){
@@ -21,6 +23,8 @@ const loadEnvVariables =()=>{
             DB_URL: process.env.DB_URL as string,
             BCRYPT_SALT_ROUND: process.env.BCRYPT_SALT_ROUND as string,
             NODE_ENV:process.env.NODE_ENV as 'development'| 'production',
+            JWT_ACCESS_EXPIRES:process.env.JWT_ACCESS_EXPIRES as string,
+            JWT_ACCESS_SECRET:process.env.JWT_ACCESS_SECRET as string
             
       }
 }

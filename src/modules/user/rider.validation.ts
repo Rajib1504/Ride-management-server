@@ -1,6 +1,6 @@
 import z from "zod";
 
-export const createUserZodSchema = z.object({
+export const createriderZodSchema = z.object({
       name: z.string({ message: "Name must be string" }).min(2, { message: "name too short. Mimimum 2 character long" }).max(20, { message: "Name is too long" }),
       email: z.string({ message: "Email mush be string" }).email({ message: "Invalid email address format" }).min(5, { message: "email must be at least 5 characters long" }).max(100, { message: "email cannot exceed 1000 characters" }),
       password: z.string({ message: "password must be string" })

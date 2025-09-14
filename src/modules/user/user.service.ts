@@ -55,7 +55,7 @@ const updateUser = async (userid: string, payload: Partial<Iuser>, deocodedToken
       const newUpdateUser = await user.findByIdAndUpdate(userid, payload, { new: true, runValidators: true })
       return newUpdateUser;
 }
-
+ 
 const getAllUser = async () => {
       const alluser = await user.find({});
       const totalUser = await user.countDocuments()

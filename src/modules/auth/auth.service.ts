@@ -1,15 +1,16 @@
 import AppError from "../../ErrorHelper/AppError";
-import { Irider } from "../user/rider.interface";
-import { rider } from "../user/rider.model";
+import { Iuser } from "../user/user.interface";
+import { user } from "../user/user.model";
 import httpStatus from 'http-status-codes';
 import bcryptjs from 'bcryptjs';
 import { generateToken } from "../../utils/jwt.token";
 import { envVars } from "../../config/env";
 
-const creadentialLogin = async (payload: Partial<Irider>) => {
+const creadentialLogin = async (payload: Partial<Iuser>) => {
       const { email, password } = payload;
+      // console.log("is email coming",email);
 
-      const isavalible = await rider.findOne({ email })
+      const isavalible = await user.findOne({ email })
       const checkPass = await bcryptjs.compare(password as string, isavalible?.password as string)
       if (!isavalible) {
             throw new AppError(httpStatus.BAD_REQUEST, "This user does not exist please register", '')
@@ -20,7 +21,7 @@ const creadentialLogin = async (payload: Partial<Irider>) => {
       }
 
       const jwtPayload = {
-            riderId: isavalible._id,
+            userId: isavalible._id,
             email: isavalible.email,
             role: isavalible.role
       }

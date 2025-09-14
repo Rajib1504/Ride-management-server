@@ -1,5 +1,5 @@
 export enum Role{
-      RIDER ="RIDER",
+      RIDER ="Rider",
       DRIVER= "DRIVER",
       ADMIN = "ADMIN"
 }
@@ -14,7 +14,7 @@ export interface IAuthProvider{
       providerId:string
 }
 
-export interface Irider{
+export interface Iuser{
       name:string,
       email:string,
       password?:string,
@@ -23,6 +23,6 @@ export interface Irider{
       role:Role,
       status:Status,
       address?:string,
-      auth:IAuthProvider[] // rider after google login can update password then do login with that password and email
+      auth:IAuthProvider[] // user after google login can update password then do login with that password and email
       
 }

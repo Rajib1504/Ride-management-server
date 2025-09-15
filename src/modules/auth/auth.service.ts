@@ -1,11 +1,11 @@
 import AppError from "../../ErrorHelper/AppError";
 import { Iuser, Status } from "../user/user.interface";
-import { user } from "../user/user.model";
+import { user} from "../user/user.model";
 import httpStatus from 'http-status-codes';
 import bcryptjs from 'bcryptjs';
 import { generateToken, verifyToken } from "../../utils/jwt.token";
 import { envVars } from "../../config/env";
-import { CreateUserTokens } from "../../utils/User.Tokens";
+import { CreateAccessTokenWithRefreshToken, CreateUserTokens } from "../../utils/User.Tokens";
 import { JwtPayload } from "jsonwebtoken";
 
 const creadentialLogin = async (payload: Partial<Iuser>) => {
@@ -40,31 +40,25 @@ const creadentialLogin = async (payload: Partial<Iuser>) => {
       }
 }
 const getNewAccessToken = async (refreshToken: string) => {
-      const varifiedRefreshToken = verifyToken(refreshToken, envVars.JWT_REFRESH_SECRET) as JwtPayload
-
-
-      const isUserAvalible = await user.findOne({ email: varifiedRefreshToken.email })
-      if (!isUserAvalible) {
-            throw new AppError(httpStatus.BAD_REQUEST, "This user does not exist", '')
-      }
-      if (isUserAvalible.status === Status.BLOCK || isUserAvalible.status === Status.INACTIVE) {
-            throw new AppError(httpStatus.BAD_REQUEST, `User is ${isUserAvalible.status}`, '');
-      }
-
-
-      const jwtPayload = {
-            userId: isUserAvalible._id,
-            email: isUserAvalible.email,
-            role: isUserAvalible.role
-      }
-
-      const accessToken = generateToken(jwtPayload, envVars.JWT_ACCESS_SECRET, envVars.JWT_ACCESS_EXPIRES)
+      const newAccessToken = await CreateAccessTokenWithRefreshToken(refreshToken)
       return {
-            accessToken: accessToken,
+            accessToken: newAccessToken,
       }
+}
+const resetPassword = async (oldPassword: string, newPassword: string, decodedToken: JwtPayload) => {
+      const User = await user.findById(decodedToken.userId)
+      const isOldPasswordMatch = await bcryptjs.compare(oldPassword, User?.password as string)
+      if (!isOldPasswordMatch) {
+            throw new AppError(httpStatus.UNAUTHORIZED, "Old password dosn't match", "");
+
+      }
+      User!.password = await bcryptjs.hash(newPassword, Number(envVars.BCRYPT_SALT_ROUND))
+      User!.save();
+      // return true;
 }
 
 export const AuthService = {
       creadentialLogin,
       getNewAccessToken,
+      resetPassword,
 }

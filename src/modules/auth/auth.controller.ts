@@ -75,6 +75,9 @@ const resetPassword = (async (req: Request, res: Response, next: NextFunction) =
             const newPassword = req.body.newPassword;
             const decodedToken = req.user;
 
+            if (!decodedToken) {
+                  throw new AppError(httpStatus.UNAUTHORIZED, "User not authenticated", '');
+            }
 
             await AuthService.resetPassword(oldPassword, newPassword, decodedToken)
 

@@ -16,7 +16,7 @@ const userSchema = new Schema<Iuser>({
       phone: { type: String },
       picture: { type: String },
       address: { type: String },
-      role: { type: String, enum: Object.values(Role), default: Role.USER },
+      role: { type: String, enum: Object.values(Role), default: Role.RIDER },
       status: { type: String, enum: Object.values(Status), default: Status.ACTIVE },
       auth:[authProviderSchema]
 
@@ -24,4 +24,4 @@ const userSchema = new Schema<Iuser>({
       timestamps: true,
       versionKey: false
 })
-export const User = model<Iuser>("user",userSchema);
+export const user = model<Iuser>("users",userSchema);

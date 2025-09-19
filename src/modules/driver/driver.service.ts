@@ -6,13 +6,9 @@ import httpStatus from 'http-status-codes';
 import { Driver } from "./driver.model";
 
 const applicationForDriver = async (payload: Partial<Idriver>, decodedToken: JwtPayload) => {
-      const { email } = decodedToken;
-      const isUserExist = await user.findOne({ email });
-      if (!isUserExist) {
-            throw new AppError(httpStatus.NOT_FOUND, "User dosn't exist", '')
-      }
+      const { userId } = decodedToken;
 
-      const existingApplication = await Driver.findOne({ user: isUserExist._id });
+      const existingApplication = await Driver.findOne({ user: userId });
       if (existingApplication) {
             throw new AppError(
                   httpStatus.BAD_REQUEST,
@@ -20,10 +16,10 @@ const applicationForDriver = async (payload: Partial<Idriver>, decodedToken: Jwt
                   '',
             );
       }
-      payload.user = isUserExist._id
+      payload.user = userId;
 
       const result = await Driver.create(payload);
-
+      return result;
 }
 export const driverService = {
       applicationForDriver,

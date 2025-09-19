@@ -3,6 +3,7 @@ import { Router } from 'express';
 import userRoute from '../modules/user/user.route';
 import AuthRoute from '../modules/auth/auth.route';
 import driverRouter from '../modules/driver/driver.routes';
+import AdminRouter from '../modules/admin/admin.route';
 export const router = Router()
 
 const moduleroutes = [
@@ -17,6 +18,10 @@ const moduleroutes = [
       {
             path: '/drivers',
             route: driverRouter
+      },
+      {
+            path: '/admin',
+            route: AdminRouter
       }
 ]
 moduleroutes.forEach((route) => {

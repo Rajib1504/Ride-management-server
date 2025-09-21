@@ -36,9 +36,34 @@ const updateAvailability = async (decodedToken: JwtPayload, isAvailable: boolean
       }
       return driverProfile
 }
+const getEarningsHistory = async (decodedToken: JwtPayload) => {
+  const { userId } = decodedToken;
+
+  // Find all completed rides for this driver
+  const completedRides = await Ride.find({
+    driver: userId,
+    status: 'COMPLETED',
+  }).populate('rider', 'name phone');
+
+  if (!completedRides || completedRides.length === 0) {
+    throw new AppError(httpStatus.NOT_FOUND, 'No completed rides found.', '');
+  }
+
+  // Calculate total earnings
+  const totalEarnings = completedRides.reduce((total, ride) => {
+    return total + (ride.fare || 0);
+  }, 0);
+
+  return {
+    rides: completedRides,
+    totalEarnings: parseFloat(totalEarnings.toFixed(2)),
+  };
+};
+
 
 export const driverService = {
       applicationForDriver,
       updateAvailability,
+      getEarningsHistory,
       
 }

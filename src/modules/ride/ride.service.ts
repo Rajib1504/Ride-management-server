@@ -6,6 +6,30 @@ import httpStatus from 'http-status-codes';
 import { Ride } from './ride.modal';
 import { Driver } from '../driver/driver.model';
 
+const calculateDistance = (
+  coords1: [number, number],
+  coords2: [number, number],
+): number => {
+  const R = 6371; // Earth's radius in kilometers
+  const [lon1, lat1] = coords1;
+  const [lon2, lat2] = coords2;
+
+  const dLat = (lat2 - lat1) * (Math.PI / 180);
+  const dLon = (lon2 - lon1) * (Math.PI / 180);
+
+  const a =
+    Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+    Math.cos(lat1 * (Math.PI / 180)) *
+    Math.cos(lat2 * (Math.PI / 180)) *
+    Math.sin(dLon / 2) *
+    Math.sin(dLon / 2);
+
+  const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+  const distance = R * c; // Distance in km
+
+  return distance;
+};
+
 const requestRide = async (payload: Pick<IRide, 'pickupLocation' | 'destinationLocation'>, decodedToken: JwtPayload) => {
   const { userId } = decodedToken;
 
@@ -64,12 +88,20 @@ const updateRideStatus = async (rideId: string, newStatus: IRideStatus, decodedT
 
   // Shudhumatro ei ride-er jonno assign kora driver-i status update korte parbe
   if (ride.driver?.toString() !== userId) {
-    throw new AppError(httpStatus.FORBIDDEN, 'You are not authorized to update this ride.', '');
+    throw new AppError(
+      httpStatus.FORBIDDEN,
+      'You are not authorized to update this ride.',
+      '',
+    );
   }
 
   // Ride-ti completed ba cancelled hoye gele status update kora jabe na
   if (ride.status === 'COMPLETED' || ride.status === 'CANCELLED') {
-    throw new AppError(httpStatus.BAD_REQUEST, `Cannot update status. Ride is already ${ride.status}.`, '');
+    throw new AppError(
+      httpStatus.BAD_REQUEST,
+      `Cannot update status. Ride is already ${ride.status}.`,
+      '',
+    );
   }
 
   // Status-er shothik sequence check kora
@@ -81,9 +113,26 @@ const updateRideStatus = async (rideId: string, newStatus: IRideStatus, decodedT
 
   const allowedNextStatuses = validTransitions[ride.status];
   if (!allowedNextStatuses || !allowedNextStatuses.includes(newStatus)) {
-    throw new AppError(httpStatus.BAD_REQUEST, `Invalid status transition from ${ride.status} to ${newStatus}.`, '');
+    throw new AppError(
+      httpStatus.BAD_REQUEST,
+      `Invalid status transition from ${ride.status} to ${newStatus}.`,
+      '',
+    );
   }
 
+  // JODI RIDE-TI COMPLETED HOY, TAHLE FARE CALCULATE KORBO
+  if (newStatus === 'COMPLETED') {
+    const PER_KM_RATE = 20;
+    const BASE_FARE = 25;
+
+    const distanceInKm = calculateDistance(
+      ride.pickupLocation.coordinates,
+      ride.destinationLocation.coordinates,
+    );
+
+    const calculatedFare = BASE_FARE + distanceInKm * PER_KM_RATE;
+    ride.fare = parseFloat(calculatedFare.toFixed(2));
+  }
   // Status update kora
   ride.status = newStatus;
   ride.rideHistory.push({ status: newStatus, timestamp: new Date() });
@@ -141,7 +190,7 @@ const getRideHistory = async (decodedToken: JwtPayload) => {
 const getPendingRides = async (decodedToken: JwtPayload) => {
   const { userId } = decodedToken;
   // console.log('User ID received in getPendingRides service:', userId);
- 
+
   const driverProfile = await Driver.findOne({ user: userId });
   // console.log('Driver Profile found in DB:', driverProfile);
   if (!driverProfile) {
@@ -187,5 +236,5 @@ export const RideServices = {
   cancelRide,
   getRideHistory,
   getPendingRides
-  
+
 };

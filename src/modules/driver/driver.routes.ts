@@ -11,7 +11,7 @@ driverRouter.post('/apply', checkAuth(Role.RIDER), validateRequest(applyForDrive
 
 driverRouter.post('/me/availability', checkAuth(Role.DRIVER), validateRequest(updateAvailabilityZodSchema), driverController.updateAvailability)
 
-
+driverRouter.get('/me/earnings', checkAuth(Role.DRIVER), driverController.getEarnings);
 
 
 export default driverRouter;

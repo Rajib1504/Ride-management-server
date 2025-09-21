@@ -39,9 +39,26 @@ const updateAvailability = async (req: Request, res: Response, next: NextFunctio
 
       }
 }
+const getEarnings = async (req: Request, res: Response, next: NextFunction) => {
+      try {
+            const user = req.user as JwtPayload;
+            const result = await driverService.getEarningsHistory(user);
+
+            sendResponse(res, {
+                  success: true,
+                  statusCode: httpStatus.OK,
+                  message: 'Earnings history retrieved successfully.',
+                  data: result,
+            });
+      } catch (error) {
+            next(error);
+      }
+};
+
 
 export const driverController = {
       driverApplication,
       updateAvailability,
-      
+      getEarnings,
+
 }

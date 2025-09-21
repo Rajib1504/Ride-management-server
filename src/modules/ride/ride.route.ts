@@ -1,6 +1,6 @@
 import { Router } from 'express';
 import { validateRequest } from '../../middlewares/validateRequest';
-import { requestRideZodSchema } from './ride.validation';
+import { requestRideZodSchema, updateRideStatusZodSchema } from './ride.validation';
 import { RideControllers } from './ride.controller';
 import { checkAuth } from '../../middlewares/checkAuth';
 import { Role } from '../user/user.interface';
@@ -14,5 +14,10 @@ rideRoute.post(
   RideControllers.requestRide,
 );
 rideRoute.patch('/:rideId/accept', checkAuth(Role.DRIVER), RideControllers.AccptRide);
-
+rideRoute.patch(
+  '/:rideId/status',
+  checkAuth(Role.DRIVER),
+  validateRequest(updateRideStatusZodSchema),
+  RideControllers.updateRideStatus,
+);
 export default rideRoute;

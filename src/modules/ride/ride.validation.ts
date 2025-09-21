@@ -9,3 +9,16 @@ export const requestRideZodSchema = z.object({
   pickupLocation: geoJsonPointSchema,
   destinationLocation: geoJsonPointSchema,
 });
+
+
+export const updateRideStatusZodSchema = z.object({
+  status: z.enum([
+    'REQUESTED',
+    'ACCEPTED',
+    'PICKED_UP',
+    'IN_TRANSIT',
+    'COMPLETED',
+    'CANCELLED',
+  ], { message: "Status is required" }),
+
+});

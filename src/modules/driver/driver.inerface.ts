@@ -15,6 +15,6 @@ export interface Idriver {
       isAvailable: boolean,
       currentLocation?: {
             type: "Point",
-            cordinates: [number, number]//[longitude, latitude]
+            coordinates: [number, number]//[longitude, latitude]
       }
 }

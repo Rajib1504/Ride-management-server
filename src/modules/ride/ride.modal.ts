@@ -42,7 +42,7 @@ const rideSchema = new Schema<IRide>(
       },
       { timestamps: true, versionKey: false },
     );
-    
+    rideSchema.index({ pickupLocation: '2dsphere' });
     // Ride toiri howar shathe shathe ride history-te initial status jog kora
     rideSchema.pre('save', function (next) {
       if (this.isNew) {

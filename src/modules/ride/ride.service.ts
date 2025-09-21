@@ -205,7 +205,7 @@ const getPendingRides = async (decodedToken: JwtPayload) => {
     throw new AppError(httpStatus.NOT_FOUND, 'Driver profile not found!', '');
   }
 
-    if (!driverProfile.currentLocation || !driverProfile.currentLocation.cordinates) {
+    if (!driverProfile.currentLocation || !driverProfile.currentLocation.coordinates) {
     throw new AppError(
       httpStatus.BAD_REQUEST,
       'Your location is not set. Please update your location to see nearby ride requests.',
@@ -237,7 +237,7 @@ const getPendingRides = async (decodedToken: JwtPayload) => {
       $near: {
         $geometry: {
           type: 'Point',
-          coordinates: driverProfile.currentLocation.cordinates,
+          coordinates: driverProfile.currentLocation.coordinates,
         },
         $maxDistance: MAX_DISTANCE_IN_METERS,
       },

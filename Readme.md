@@ -12,6 +12,9 @@ The core features include a robust authentication system using JWT, role-based a
 -   **User Management:** Admins can view all users and block/unblock their accounts.
 -   **Driver Lifecycle:** Riders can apply to become drivers, and admins can approve or reject these applications.
 -   **Ride Lifecycle:** Riders can request rides, drivers can accept and update ride status (`PICKED_UP`, `IN_TRANSIT`, `COMPLETED`), and riders can cancel their requests.
+-   
+### video explanation: 
+`https://drive.google.com/file/d/1oLeKXV0b6VOuYRSoyWSmGR6vYXJuLKvE/view?usp=sharing`
 
 ## 🛠️ Setup & Environment Instructions
 
@@ -65,6 +68,10 @@ The core features include a robust authentication system using JWT, role-based a
         npm start
         ```
     The server should now be running on the port specified in your `.env` file.
+7. ** Admin details: `
+email: rider@test.com
+password:Rider123!`
+### Postman: import from GitHub repo.
 
 ## 🔁 API Endpoints Summary
 

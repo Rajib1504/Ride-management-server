@@ -23,7 +23,25 @@ const requestRide = async (
     next(error);
   }
 };
+const AccptRide = async (req: Request, res: Response, next: NextFunction) => {
+      try {
+           const {rideId}= req.params;
+           const user = req.user as JwtPayload;
+           const result = await RideServices.AccptRide(rideId, user)
+            sendResponse(res, {
+                  success: true,
+                  statusCode: httpStatus.OK,
+                  message: "Ride accepted successfully",
+                  data: result,
+            });
+
+      } catch (error) {
+            next(error)
+
+      }
+}
 
 export const RideControllers = {
   requestRide,
+  AccptRide
 };

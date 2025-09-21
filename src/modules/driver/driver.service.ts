@@ -4,6 +4,7 @@ import { user } from "../user/user.model";
 import AppError from "../../ErrorHelper/AppError";
 import httpStatus from 'http-status-codes';
 import { Driver } from "./driver.model";
+import { Ride } from "../ride/ride.modal";
 
 const applicationForDriver = async (payload: Partial<Idriver>, decodedToken: JwtPayload) => {
       const { userId } = decodedToken;
@@ -35,7 +36,9 @@ const updateAvailability = async (decodedToken: JwtPayload, isAvailable: boolean
       }
       return driverProfile
 }
+
 export const driverService = {
       applicationForDriver,
-      updateAvailability
+      updateAvailability,
+      
 }

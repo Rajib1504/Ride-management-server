@@ -13,5 +13,6 @@ rideRoute.post(
   validateRequest(requestRideZodSchema),
   RideControllers.requestRide,
 );
+rideRoute.patch('/:rideId/accept', checkAuth(Role.DRIVER), RideControllers.AccptRide);
 
 export default rideRoute;

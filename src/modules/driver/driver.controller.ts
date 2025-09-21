@@ -39,7 +39,9 @@ const updateAvailability = async (req: Request, res: Response, next: NextFunctio
 
       }
 }
+
 export const driverController = {
       driverApplication,
       updateAvailability,
+      
 }

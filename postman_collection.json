@@ -1,0 +1,623 @@
+{
+	"info": {
+		"_postman_id": "a1b2c3d4-e5f6-7890-1234-abcdef123456",
+		"name": "Ride Booking API",
+		"description": "A complete Postman collection for the Ride Booking API, covering all roles and functionalities.",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Authentication",
+			"description": "Handles user registration and login.",
+			"item": [
+				{
+					"name": "Register New Rider",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"console.log(pm.response.json());"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"name\": \"Test Rider\",\n    \"email\": \"rider@test.com\",\n    \"password\": \"Rider123!\",\n    \"phone\": \"9876543210\"\n}"
+						},
+						"url": {
+							"raw": "{{BASE_URL}}/api/v1/user/register",
+							"host": [
+								"{{BASE_URL}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"user",
+								"register"
+							]
+						},
+						"description": "Registers a new user with the default role of 'Rider'."
+					},
+					"response": []
+				},
+				{
+					"name": "Login User (Rider/Driver/Admin)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"const response = pm.response.json();",
+									"if (response.data && response.data.accessToken) {",
+									"    const userRole = response.data.user.role;",
+									"    if (userRole === 'Rider') {",
+									"        pm.collectionVariables.set(\"RIDER_TOKEN\", response.data.accessToken);",
+									"        pm.collectionVariables.set(\"RIDER_ID\", response.data.user._id);",
+									"    } else if (userRole === 'Driver') {",
+									"        pm.collectionVariables.set(\"DRIVER_TOKEN\", response.data.accessToken);",
+									"        pm.collectionVariables.set(\"DRIVER_ID\", response.data.user._id);",
+									"    } else if (userRole === 'Admin') {",
+									"        pm.collectionVariables.set(\"ADMIN_TOKEN\", response.data.accessToken);",
+									"    }",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"email\": \"rider@test.com\",\n    \"password\": \"Rider123!\"\n}"
+						},
+						"url": {
+							"raw": "{{BASE_URL}}/api/v1/auth/login",
+							"host": [
+								"{{BASE_URL}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"auth",
+								"login"
+							]
+						},
+						"description": "Logs in a user and automatically saves the `accessToken` and `userId` to collection variables based on the user's role."
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Driver",
+			"description": "Endpoints specific to the Driver role.",
+			"item": [
+				{
+					"name": "Apply to be a Driver",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"const response = pm.response.json();",
+									"if (response.data && response.data._id) {",
+									"    pm.collectionVariables.set(\"DRIVER_APP_ID\", response.data._id);",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "{{RIDER_TOKEN}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"licenseNumber\": \"WB1234567890\",\n    \"licenseImage\": \"https://example.com/license.jpg\",\n    \"vehicleDetails\": {\n        \"type\": \"car\",\n        \"model\": \"Toyota Corolla\",\n        \"color\": \"White\",\n        \"plateNumber\": \"WB 01 AB 1234\"\n    }\n}"
+						},
+						"url": {
+							"raw": "{{BASE_URL}}/api/v1/drivers/apply",
+							"host": [
+								"{{BASE_URL}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"drivers",
+								"apply"
+							]
+						},
+						"description": "A registered 'Rider' applies to become a 'Driver'. Requires Rider's token. Saves the application ID."
+					},
+					"response": []
+				},
+				{
+					"name": "Update Availability (Go Online/Offline)",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "{{DRIVER_TOKEN}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"isAvailable\": true\n}"
+						},
+						"url": {
+							"raw": "{{BASE_URL}}/api/v1/drivers/me/availability",
+							"host": [
+								"{{BASE_URL}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"drivers",
+								"me",
+								"availability"
+							]
+						},
+						"description": "An approved 'Driver' sets their availability status. `true` for Online, `false` for Offline. Requires Driver's token."
+					},
+					"response": []
+				},
+				{
+					"name": "Update Current Location",
+					"request": {
+						"method": "PATCH",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "{{DRIVER_TOKEN}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"currentLocation\": {\n    \"type\": \"Point\",\n    \"coordinates\": [\n      88.3639, \n      22.5726\n    ]\n  }\n}"
+						},
+						"url": {
+							"raw": "{{BASE_URL}}/api/v1/drivers/me/location",
+							"host": [
+								"{{BASE_URL}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"drivers",
+								"me",
+								"location"
+							]
+						},
+						"description": "An approved 'Driver' updates their current location to see nearby rides. Requires Driver's token."
+					},
+					"response": []
+				},
+				{
+					"name": "Get Earnings History",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "{{DRIVER_TOKEN}}"
+							}
+						],
+						"url": {
+							"raw": "{{BASE_URL}}/api/v1/drivers/me/earnings",
+							"host": [
+								"{{BASE_URL}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"drivers",
+								"me",
+								"earnings"
+							]
+						},
+						"description": "An approved 'Driver' checks their earnings from completed rides. Requires Driver's token."
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Ride Management",
+			"description": "Endpoints for requesting and managing rides.",
+			"item": [
+				{
+					"name": "Request a Ride",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"const response = pm.response.json();",
+									"if (response.data && response.data._id) {",
+									"    pm.collectionVariables.set(\"RIDE_ID\", response.data._id);",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "{{RIDER_TOKEN}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"pickupLocation\": {\n        \"type\": \"Point\",\n        \"coordinates\": [88.3650, 22.5730]\n    },\n    \"destinationLocation\": {\n        \"type\": \"Point\",\n        \"coordinates\": [88.4331, 22.5645]\n    }\n}"
+						},
+						"url": {
+							"raw": "{{BASE_URL}}/api/v1/rides/request",
+							"host": [
+								"{{BASE_URL}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"rides",
+								"request"
+							]
+						},
+						"description": "A 'Rider' requests a new ride. Requires Rider's token. Saves the `rideId`."
+					},
+					"response": []
+				},
+				{
+					"name": "Get Pending Rides (Driver)",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "{{DRIVER_TOKEN}}"
+							}
+						],
+						"url": {
+							"raw": "{{BASE_URL}}/api/v1/rides/pending",
+							"host": [
+								"{{BASE_URL}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"rides",
+								"pending"
+							]
+						},
+						"description": "An 'Online' Driver with an updated location can see nearby pending rides. Requires Driver's token."
+					},
+					"response": []
+				},
+				{
+					"name": "Accept a Ride (Driver)",
+					"request": {
+						"method": "PATCH",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "{{DRIVER_TOKEN}}"
+							}
+						],
+						"url": {
+							"raw": "{{BASE_URL}}/api/v1/rides/{{RIDE_ID}}/accept",
+							"host": [
+								"{{BASE_URL}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"rides",
+								"{{RIDE_ID}}",
+								"accept"
+							]
+						},
+						"description": "A 'Driver' accepts a pending ride. Requires Driver's token and the `rideId`."
+					},
+					"response": []
+				},
+				{
+					"name": "Update Ride Status (Driver)",
+					"request": {
+						"method": "PATCH",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "{{DRIVER_TOKEN}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"status\": \"PICKED_UP\"\n}"
+						},
+						"url": {
+							"raw": "{{BASE_URL}}/api/v1/rides/{{RIDE_ID}}/status",
+							"host": [
+								"{{BASE_URL}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"rides",
+								"{{RIDE_ID}}",
+								"status"
+							]
+						},
+						"description": "A 'Driver' updates the status of an ongoing ride. Status can be `PICKED_UP`, `IN_TRANSIT`, or `COMPLETED`. Requires Driver's token."
+					},
+					"response": []
+				},
+				{
+					"name": "Cancel a Ride (Rider)",
+					"request": {
+						"method": "PATCH",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "{{RIDER_TOKEN}}"
+							}
+						],
+						"url": {
+							"raw": "{{BASE_URL}}/api/v1/rides/{{RIDE_ID}}/cancel",
+							"host": [
+								"{{BASE_URL}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"rides",
+								"{{RIDE_ID}}",
+								"cancel"
+							]
+						},
+						"description": "A 'Rider' can cancel their ride as long as it's in the 'REQUESTED' state. Requires Rider's token."
+					},
+					"response": []
+				},
+				{
+					"name": "Get Ride History (Rider/Driver)",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "{{RIDER_TOKEN}}"
+							}
+						],
+						"url": {
+							"raw": "{{BASE_URL}}/api/v1/rides/history",
+							"host": [
+								"{{BASE_URL}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"rides",
+								"history"
+							]
+						},
+						"description": "A 'Rider' or 'Driver' can view their own ride history. Use the respective token."
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Admin",
+			"description": "Endpoints exclusive to the Admin role.",
+			"item": [
+				{
+					"name": "Get All Driver Applications",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "{{ADMIN_TOKEN}}"
+							}
+						],
+						"url": {
+							"raw": "{{BASE_URL}}/api/v1/admin/driver-applications",
+							"host": [
+								"{{BASE_URL}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"admin",
+								"driver-applications"
+							]
+						},
+						"description": "An 'Admin' views all pending driver applications. Requires Admin's token."
+					},
+					"response": []
+				},
+				{
+					"name": "Approve Driver Application",
+					"request": {
+						"method": "PATCH",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "{{ADMIN_TOKEN}}"
+							}
+						],
+						"url": {
+							"raw": "{{BASE_URL}}/api/v1/admin/driver-applications/{{DRIVER_APP_ID}}/approve",
+							"host": [
+								"{{BASE_URL}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"admin",
+								"driver-applications",
+								"{{DRIVER_APP_ID}}",
+								"approve"
+							]
+						},
+						"description": "An 'Admin' approves a driver application. Requires Admin's token and the `driver_app_id`."
+					},
+					"response": []
+				},
+				{
+					"name": "Reject Driver Application",
+					"request": {
+						"method": "PATCH",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "{{ADMIN_TOKEN}}"
+							}
+						],
+						"url": {
+							"raw": "{{BASE_URL}}/api/v1/admin/driver-applications/{{DRIVER_APP_ID}}/reject",
+							"host": [
+								"{{BASE_URL}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"admin",
+								"driver-applications",
+								"{{DRIVER_APP_ID}}",
+								"reject"
+							]
+						},
+						"description": "An 'Admin' rejects a driver application. Requires Admin's token and the `driver_app_id`."
+					},
+					"response": []
+				},
+				{
+					"name": "Update User Status (Block/Unblock)",
+					"request": {
+						"method": "PATCH",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "{{ADMIN_TOKEN}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"status\": \"BLOCK\"\n}"
+						},
+						"url": {
+							"raw": "{{BASE_URL}}/api/v1/admin/users/{{RIDER_ID}}/status",
+							"host": [
+								"{{BASE_URL}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"admin",
+								"users",
+								"{{RIDER_ID}}",
+								"status"
+							]
+						},
+						"description": "An 'Admin' can change a user's status to `ACTIVE`, `BLOCK`, or `INACTIVE`. Requires Admin's token and the `userId` of the target user."
+					},
+					"response": []
+				}
+			]
+		}
+	],
+	"variable": [
+		{
+			"key": "BASE_URL",
+			"value": "https://ride-share-backend-sigma.vercel.app",
+			"type": "string"
+		},
+		{
+			"key": "RIDER_TOKEN",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "DRIVER_TOKEN",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "ADMIN_TOKEN",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "RIDE_ID",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "DRIVER_APP_ID",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "RIDER_ID",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "DRIVER_ID",
+			"value": "",
+			"type": "string"
+		}
+	]
+}
+

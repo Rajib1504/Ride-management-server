@@ -149,6 +149,15 @@ const cancelRide = async (rideId: string, decodedToken: JwtPayload) => {
     throw new AppError(httpStatus.NOT_FOUND, 'Ride not found!', '');
   }
 
+
+  if (!ride.createdAt) {
+    throw new AppError(
+      httpStatus.INTERNAL_SERVER_ERROR,
+      'Could not determine ride creation time.',
+      '',
+    );
+  }
+  
   // Shudhumatro je rider ride-ti request koreche, shei cancel korte parbe
   if (ride.rider.toString() !== userId) {
     throw new AppError(httpStatus.FORBIDDEN, 'You are not authorized to cancel this ride.', '');
@@ -159,6 +168,19 @@ const cancelRide = async (rideId: string, decodedToken: JwtPayload) => {
     throw new AppError(
       httpStatus.BAD_REQUEST,
       `You cannot cancel this ride as it is already ${ride.status}.`,
+      '',
+    );
+  }
+
+  const CANCELLATION_WINDOW_IN_MINUTES = 2;
+  const timeElapsed = new Date().getTime() - new Date(ride.createdAt).getTime();
+  const minutesElapsed = timeElapsed / (1000 * 60);
+
+  // Jodi nirdishto shomoy (2 min) par hoye jay, tobe cancel kora jabe na
+  if (minutesElapsed > CANCELLATION_WINDOW_IN_MINUTES) {
+    throw new AppError(
+      httpStatus.BAD_REQUEST,
+      `You can only cancel a ride within ${CANCELLATION_WINDOW_IN_MINUTES} minutes of requesting.`,
       '',
     );
   }
@@ -197,6 +219,14 @@ const getPendingRides = async (decodedToken: JwtPayload) => {
     throw new AppError(httpStatus.NOT_FOUND, 'Driver profile not found!', '');
   }
 
+    if (!driverProfile.currentLocation || !driverProfile.currentLocation.cordinates) {
+    throw new AppError(
+      httpStatus.BAD_REQUEST,
+      'Your location is not set. Please update your location to see nearby ride requests.',
+      '',
+    );
+  }
+
   if (driverProfile.approvalStatus !== 'approved') {
     throw new AppError(
       httpStatus.FORBIDDEN,
@@ -213,11 +243,21 @@ const getPendingRides = async (decodedToken: JwtPayload) => {
     );
   }
 
-  // Find all rides that are currently in 'REQUESTED' state
-  const pendingRides = await Ride.find({ status: 'REQUESTED' }).populate(
-    'rider',
-    'name phone', // Rider er shudhu name and phone dekhabo
-  );
+ const MAX_DISTANCE_IN_METERS = 5000; // 5 kilometers
+
+  const pendingRides = await Ride.find({
+    status: 'REQUESTED',
+    pickupLocation: {
+      $near: {
+        $geometry: {
+          type: 'Point',
+          coordinates: driverProfile.currentLocation.cordinates,
+        },
+        $maxDistance: MAX_DISTANCE_IN_METERS,
+      },
+    },
+  }).populate('rider', 'name phone');
+
 
   if (!pendingRides || pendingRides.length === 0) {
     throw new AppError(

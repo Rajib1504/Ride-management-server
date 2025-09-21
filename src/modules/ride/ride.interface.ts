@@ -25,5 +25,7 @@ export interface IRide {
       status: IRideStatus;
       rideHistory: RideHistory[]
       fare?: number;
+      createdAt?: Date;
+      updatedAt?: Date;
 
 }

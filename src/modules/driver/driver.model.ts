@@ -1,6 +1,5 @@
 import { model, Schema } from "mongoose";
 import { Idriver, IvehicleDetails } from "./driver.inerface";
-import { user } from "../user/user.model";
 
 const vehicleDetailsSchema = new Schema<IvehicleDetails>(
       {
@@ -31,7 +30,7 @@ const driverProfieSchema = new Schema<Idriver>(
       {
             user: {
                   type: Schema.Types.ObjectId,
-                  ref: user,
+                  ref: "users",
                   required: true,
                   unique: true
             },

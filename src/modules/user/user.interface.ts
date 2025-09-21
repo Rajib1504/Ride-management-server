@@ -2,8 +2,8 @@ import { Types } from "mongoose"
 
 export enum Role {
       RIDER = "Rider",
-      DRIVER = "DRIVER",
-      ADMIN = "ADMIN"
+      DRIVER = "Driver",
+      ADMIN = "Admin"
 }
 export enum Status {
       ACTIVE = "ACTIVE",

@@ -121,9 +121,71 @@ const cancelRide = async (rideId: string, decodedToken: JwtPayload) => {
   return ride;
 };
 
+const getRideHistory = async (decodedToken: JwtPayload) => {
+  const { userId, role } = decodedToken;
+
+  let rides;
+
+  if (role === 'Rider') {
+    rides = await Ride.find({ rider: userId }).populate('driver', 'name phone');
+  } else if (role === 'Driver') {
+    rides = await Ride.find({ driver: userId }).populate('rider', 'name phone');
+  }
+
+  if (!rides || rides.length === 0) {
+    throw new AppError(httpStatus.NOT_FOUND, 'No ride history found.', '');
+  }
+
+  return rides;
+};
+const getPendingRides = async (decodedToken: JwtPayload) => {
+  const { userId } = decodedToken;
+  // console.log('User ID received in getPendingRides service:', userId);
+ 
+  const driverProfile = await Driver.findOne({ user: userId });
+  // console.log('Driver Profile found in DB:', driverProfile);
+  if (!driverProfile) {
+    throw new AppError(httpStatus.NOT_FOUND, 'Driver profile not found!', '');
+  }
+
+  if (driverProfile.approvalStatus !== 'approved') {
+    throw new AppError(
+      httpStatus.FORBIDDEN,
+      'Your application is not approved yet.',
+      '',
+    );
+  }
+
+  if (!driverProfile.isAvailable) {
+    throw new AppError(
+      httpStatus.BAD_REQUEST,
+      'You are currently offline. Please go online to see ride requests.',
+      '',
+    );
+  }
+
+  // Find all rides that are currently in 'REQUESTED' state
+  const pendingRides = await Ride.find({ status: 'REQUESTED' }).populate(
+    'rider',
+    'name phone', // Rider er shudhu name and phone dekhabo
+  );
+
+  if (!pendingRides || pendingRides.length === 0) {
+    throw new AppError(
+      httpStatus.NOT_FOUND,
+      'No pending ride requests found at the moment.',
+      '',
+    );
+  }
+
+  return pendingRides;
+};
 export const RideServices = {
   requestRide,
   AccptRide,
   updateRideStatus,
-  cancelRide
+  cancelRide,
+  getRideHistory,
+  getPendingRides
+  
 };

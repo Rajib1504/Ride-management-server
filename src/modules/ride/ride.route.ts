@@ -25,4 +25,14 @@ rideRoute.patch(
   checkAuth(Role.RIDER),
   RideControllers.cancelRide,
 );
+rideRoute.get(
+  '/pending',
+  checkAuth(Role.DRIVER), 
+  RideControllers.getPendingRides,
+);
+rideRoute.get(
+  '/history',
+  checkAuth(Role.RIDER, Role.DRIVER), 
+  RideControllers.getRideHistory,
+);
 export default rideRoute;

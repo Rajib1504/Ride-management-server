@@ -74,9 +74,45 @@ const cancelRide = async (req: Request, res: Response, next: NextFunction) => {
     next(error);
   }
 };
+const getRideHistory = async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const user = req.user as JwtPayload;
+    const result = await RideServices.getRideHistory(user);
+
+    sendResponse(res, {
+      success: true,
+      statusCode: httpStatus.OK,
+      message: 'Ride history retrieved successfully.',
+      data: result,
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+const getPendingRides = async (
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) => {
+  try {
+    const user = req.user as JwtPayload;
+    const result = await RideServices.getPendingRides(user);
+
+    sendResponse(res, {
+      success: true,
+      statusCode: httpStatus.OK,
+      message: 'Pending ride requests retrieved successfully.',
+      data: result,
+    });
+  } catch (error) {
+    next(error);
+  }
+};
 export const RideControllers = {
   requestRide,
   AccptRide,
   updateRideStatus,
   cancelRide,
+  getRideHistory,
+  getPendingRides
 };

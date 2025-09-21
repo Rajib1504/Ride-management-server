@@ -60,10 +60,31 @@ const getEarningsHistory = async (decodedToken: JwtPayload) => {
   };
 };
 
+const updateCurrentLocation = async (decodedToken: JwtPayload, location: { coordinates: [number, number] }) => {
+    const { userId } = decodedToken;
+  
+    const driverProfile = await Driver.findOneAndUpdate(
+      { user: userId },
+      {
+        currentLocation: {
+          type: 'Point',
+          coordinates: location.coordinates,
+        },
+      },
+      { new: true, runValidators: true },
+    );
+  
+    if (!driverProfile) {
+      throw new AppError(httpStatus.NOT_FOUND, 'Driver profile not found!', '');
+    }
+  
+    return driverProfile;
+  };
 
 export const driverService = {
       applicationForDriver,
       updateAvailability,
       getEarningsHistory,
+      updateCurrentLocation,
       
 }

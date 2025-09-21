@@ -16,3 +16,11 @@ export const applyForDriverZodSchema = z.object({
 export const updateAvailabilityZodSchema = z.object({
       isAvailable: z.boolean().nonoptional("Availability status is required")
 })
+const geoJsonPointSchema = z.object({
+  type: z.literal('Point', { message: 'Location type must be Point' }),
+  coordinates: z.array(z.number()).length(2, { message: 'Coordinates must be an array of two numbers [longitude, latitude]' }),
+});
+
+export const updateLocationZodSchema = z.object({
+    currentLocation: geoJsonPointSchema,
+})

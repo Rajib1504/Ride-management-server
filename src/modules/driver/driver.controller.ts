@@ -54,11 +54,27 @@ const getEarnings = async (req: Request, res: Response, next: NextFunction) => {
             next(error);
       }
 };
-
+const updateLocation = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const user = req.user as JwtPayload;
+      const { currentLocation } = req.body;
+      const result = await driverService.updateCurrentLocation(user, currentLocation);
+  
+      sendResponse(res, {
+        success: true,
+        statusCode: httpStatus.OK,
+        message: 'Driver location updated successfully.',
+        data: result,
+      });
+    } catch (error) {
+      next(error);
+    }
+  };
 
 export const driverController = {
       driverApplication,
       updateAvailability,
       getEarnings,
+      updateLocation
 
 }

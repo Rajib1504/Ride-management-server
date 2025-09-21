@@ -12,3 +12,7 @@ export const applyForDriverZodSchema = z.object({
       licenseImage: z.url('License image URL is required'),
       vehicleDetails: vehicleDetailsZodSchema,
 });
+
+export const updateAvailabilityZodSchema = z.object({
+      isAvailable: z.boolean().nonoptional("Availability status is required")
+})

@@ -21,6 +21,21 @@ const applicationForDriver = async (payload: Partial<Idriver>, decodedToken: Jwt
       const result = await Driver.create(payload);
       return result;
 }
+
+const updateAvailability = async (decodedToken: JwtPayload, isAvailable: boolean) => {
+      const { userId } = decodedToken;
+
+      const driverProfile = await Driver.findOneAndUpdate(
+            { user: userId },
+            { isAvailable: isAvailable },
+            { new: true, runValidators: true }
+      )
+      if (!driverProfile) {
+            throw new AppError(httpStatus.NOT_FOUND, "Driver is not exist", '')
+      }
+      return driverProfile
+}
 export const driverService = {
       applicationForDriver,
+      updateAvailability
 }

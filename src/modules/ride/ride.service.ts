@@ -163,24 +163,10 @@ const cancelRide = async (rideId: string, decodedToken: JwtPayload) => {
     throw new AppError(httpStatus.FORBIDDEN, 'You are not authorized to cancel this ride.', '');
   }
 
-  // Shudhumatro 'REQUESTED' status-ei ride cancel kora jabe
   if (ride.status !== 'REQUESTED') {
     throw new AppError(
       httpStatus.BAD_REQUEST,
       `You cannot cancel this ride as it is already ${ride.status}.`,
-      '',
-    );
-  }
-
-  const CANCELLATION_WINDOW_IN_MINUTES = 2;
-  const timeElapsed = new Date().getTime() - new Date(ride.createdAt).getTime();
-  const minutesElapsed = timeElapsed / (1000 * 60);
-
-  // Jodi nirdishto shomoy (2 min) par hoye jay, tobe cancel kora jabe na
-  if (minutesElapsed > CANCELLATION_WINDOW_IN_MINUTES) {
-    throw new AppError(
-      httpStatus.BAD_REQUEST,
-      `You can only cancel a ride within ${CANCELLATION_WINDOW_IN_MINUTES} minutes of requesting.`,
       '',
     );
   }

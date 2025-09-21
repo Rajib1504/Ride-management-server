@@ -24,21 +24,21 @@ const requestRide = async (
   }
 };
 const AccptRide = async (req: Request, res: Response, next: NextFunction) => {
-      try {
-           const {rideId}= req.params;
-           const user = req.user as JwtPayload;
-           const result = await RideServices.AccptRide(rideId, user)
-            sendResponse(res, {
-                  success: true,
-                  statusCode: httpStatus.OK,
-                  message: "Ride accepted successfully",
-                  data: result,
-            });
+  try {
+    const { rideId } = req.params;
+    const user = req.user as JwtPayload;
+    const result = await RideServices.AccptRide(rideId, user)
+    sendResponse(res, {
+      success: true,
+      statusCode: httpStatus.OK,
+      message: "Ride accepted successfully",
+      data: result,
+    });
 
-      } catch (error) {
-            next(error)
+  } catch (error) {
+    next(error)
 
-      }
+  }
 }
 const updateRideStatus = async (req: Request, res: Response, next: NextFunction) => {
   try {
@@ -57,8 +57,26 @@ const updateRideStatus = async (req: Request, res: Response, next: NextFunction)
     next(error);
   }
 };
+
+const cancelRide = async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const { rideId } = req.params;
+    const user = req.user as JwtPayload;
+    const result = await RideServices.cancelRide(rideId, user);
+
+    sendResponse(res, {
+      success: true,
+      statusCode: httpStatus.OK,
+      message: 'Ride cancelled successfully.',
+      data: result,
+    });
+  } catch (error) {
+    next(error);
+  }
+};
 export const RideControllers = {
   requestRide,
   AccptRide,
   updateRideStatus,
+  cancelRide,
 };

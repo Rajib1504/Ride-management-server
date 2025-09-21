@@ -91,8 +91,39 @@ const updateRideStatus = async (rideId: string, newStatus: IRideStatus, decodedT
   await ride.save();
   return ride;
 };
+
+const cancelRide = async (rideId: string, decodedToken: JwtPayload) => {
+  const { userId } = decodedToken;
+
+  const ride = await Ride.findById(rideId);
+  if (!ride) {
+    throw new AppError(httpStatus.NOT_FOUND, 'Ride not found!', '');
+  }
+
+  // Shudhumatro je rider ride-ti request koreche, shei cancel korte parbe
+  if (ride.rider.toString() !== userId) {
+    throw new AppError(httpStatus.FORBIDDEN, 'You are not authorized to cancel this ride.', '');
+  }
+
+  // Shudhumatro 'REQUESTED' status-ei ride cancel kora jabe
+  if (ride.status !== 'REQUESTED') {
+    throw new AppError(
+      httpStatus.BAD_REQUEST,
+      `You cannot cancel this ride as it is already ${ride.status}.`,
+      '',
+    );
+  }
+
+  ride.status = 'CANCELLED';
+  ride.rideHistory.push({ status: 'CANCELLED', timestamp: new Date() });
+
+  await ride.save();
+  return ride;
+};
+
 export const RideServices = {
   requestRide,
   AccptRide,
-  updateRideStatus
+  updateRideStatus,
+  cancelRide
 };

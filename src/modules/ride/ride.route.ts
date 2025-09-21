@@ -20,4 +20,9 @@ rideRoute.patch(
   validateRequest(updateRideStatusZodSchema),
   RideControllers.updateRideStatus,
 );
+rideRoute.patch(
+  '/:rideId/cancel',
+  checkAuth(Role.RIDER),
+  RideControllers.cancelRide,
+);
 export default rideRoute;
